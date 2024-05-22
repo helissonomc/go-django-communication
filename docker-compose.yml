@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile-go
+    ports:
+      - "8080:8080"
+    command: sh -c "sh"
+    volumes:
+      - ./go:/app
+    environment:
+      - GO_ENV=production

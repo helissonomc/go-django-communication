@@ -9,7 +9,7 @@ services:
       - "8080:8080"
     volumes:
       - ./go:/app
-    command: sh -c "go build -o main ./server/server.go && ./main"
+    command: sh -c "go build -o main ./server/server.go && sleep 15s && ./main"
     environment:
       - GO_ENV=production
       - DB_HOST=mysql

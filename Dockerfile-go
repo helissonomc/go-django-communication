@@ -6,8 +6,9 @@ WORKDIR /app
 # Copy the source code into the container
 COPY ./go .
 
+
 # Download all dependencies
-RUN go mod download
+RUN go mod tidy
 
 # Expose port 8080 to the outside world
 EXPOSE 8080

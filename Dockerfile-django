@@ -5,16 +5,7 @@ ENV PYTHONUNBUFFERED 1
 RUN pip install --upgrade pip
 # Install dependencies
 COPY ./django-app/requirements.txt /requirements.txt
-
-RUN apk add --update --no-cache postgresql-client
-RUN apk add --update --no-cache --virtual .tmp-build-deps \
-    gcc libc-dev linux-headers postgresql-dev
-
 RUN pip install -r ./requirements.txt
 
-RUN apk del .tmp-build-deps
-# It is necessary to use PostGis with django
-RUN apk add --no-cache geos proj gdal
-
 COPY ./django-app /django-app
-WORKDIR /django-app
+WORKDIR /django-app/django_app

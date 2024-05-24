@@ -115,7 +115,15 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user.Password = string(hashedPassword)
-		_, err = database.DB.Exec("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?", user.Name, user.Email, user.Password, id)
+		_, err = database.DB.Exec(
+            `UPDATE users 
+            SET name = ?, email = ?, password = ?
+            WHERE id = ?`,
+            user.Name,
+            user.Email,
+            user.Password,
+            id,
+        )
 	} else {
 		_, err = database.DB.Exec("UPDATE users SET name = ?, email = ? WHERE id = ?", user.Name, user.Email, id)
 	}
@@ -144,3 +152,4 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+

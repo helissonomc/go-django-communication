@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine
+FROM golang:1.22
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -9,6 +9,9 @@ COPY ./go .
 
 # Download all dependencies
 RUN go mod tidy
+
+RUN apt update
+RUN apt install -y protobuf-compiler
 
 # Expose port 8080 to the outside world
 EXPOSE 8080

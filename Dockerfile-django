@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10-slim
 
 ENV PYTHONUNBUFFERED 1
 
@@ -6,6 +6,7 @@ RUN pip install --upgrade pip
 # Install dependencies
 COPY ./django-app/requirements.txt /requirements.txt
 RUN pip install -r ./requirements.txt
-
-COPY ./django-app /django-app
-WORKDIR /django-app/django_app
+RUN apt update
+RUN apt install -y protobuf-compiler
+WORKDIR /app
+COPY ./django-app .

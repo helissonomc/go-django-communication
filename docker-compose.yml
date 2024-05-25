@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     volumes:
       - ./go:/app
-    command: sh -c "go build -o ./cmd/main ./cmd/main.go && sleep 15s && ./cmd/main"
+    command: sh -c "go build -o ./cmd/main ./cmd/main.go && sleep 5s && ./cmd/main"
     environment:
       - GO_ENV=production
       - DB_HOST=mysql
@@ -20,7 +20,7 @@ services:
       - DB_NAME=testdb
     depends_on:
       - mysql
-  
+
   django-server:
     stdin_open: true
     build:
@@ -29,10 +29,23 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./django-app/django_app:/django_app
+      - ./django-app:/app
     command: >
-      sh -c "ls && python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8081"
+      sh -c "ls && python django_app/manage.py migrate &&
+             python django_app/manage.py runserver 0.0.0.0:8081"
+
+  django-grpc-server:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile-django
+    ports:
+      - "50052:50052"
+    volumes:
+      - ./django-app:/app
+    command: >
+      sh -c "ls && python django_app/manage.py migrate &&
+             python django_app/user_service.py"
 
   mysql:
     image: mysql:8.0

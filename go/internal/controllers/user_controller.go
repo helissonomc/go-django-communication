@@ -1,14 +1,19 @@
 package controllers
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"go-django/internal/database"
+	"go-django/internal/grpc_client"
 	"go-django/internal/models"
+	"go-django/internal/pb"
+	"log"
 	"net/http"
 	"strconv"
-    "golang.org/x/crypto/bcrypt"
+
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -29,9 +34,9 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 		users = append(users, user)
 	}
-    response := models.ResultResponse{
-        RESULTS: users,
-    }
+	response := models.ResultResponse{
+		RESULTS: users,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
@@ -68,14 +73,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-    if err != nil {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
 
 	user.Password = string(hashedPassword)
-    result, err := database.DB.Exec("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", user.Name, user.Email, user.Password)
+	result, err := database.DB.Exec("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", user.Name, user.Email, user.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -87,10 +92,24 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.ID = int(id)
-    user.Password = ""
+	user.Password = ""
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(user)
+
+	// Call gRPC to notify Django service
+	grpcUser := &pb.User{
+		Id:       int32(user.ID),
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+	}
+	log.Println(grpcUser)
+
+	_, err = grpc_client.CreateUser(context.Background(), grpcUser)
+	if err != nil {
+		log.Println(http.StatusInternalServerError)
+	}
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -107,8 +126,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-    
-    if user.Password != "" {
+
+	if user.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "Failed to hash password", http.StatusInternalServerError)
@@ -116,14 +135,14 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		}
 		user.Password = string(hashedPassword)
 		_, err = database.DB.Exec(
-            `UPDATE users 
+			`UPDATE users
             SET name = ?, email = ?, password = ?
             WHERE id = ?`,
-            user.Name,
-            user.Email,
-            user.Password,
-            id,
-        )
+			user.Name,
+			user.Email,
+			user.Password,
+			id,
+		)
 	} else {
 		_, err = database.DB.Exec("UPDATE users SET name = ?, email = ? WHERE id = ?", user.Name, user.Email, id)
 	}
@@ -152,4 +171,3 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
-

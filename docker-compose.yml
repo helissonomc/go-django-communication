@@ -31,8 +31,21 @@ services:
     volumes:
       - ./django-app:/app
     command: >
-      sh -c "ls && python django_app/manage.py migrate &&
+      sh -c "python django_app/manage.py wait_for_db_command &&
+             python django_app/manage.py migrate &&
+             python django_app/manage.py create_super_user &&
              python django_app/manage.py runserver 0.0.0.0:8081"
+    environment:
+      - DB_HOST=mysql-django
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=testdb
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+      - DJANGO_SUPERUSER_PASSWORD=adminpassword
+    depends_on:
+      - mysql-django
 
   django-grpc-server:
     stdin_open: true
@@ -44,8 +57,26 @@ services:
     volumes:
       - ./django-app:/app
     command: >
-      sh -c "ls && python django_app/manage.py migrate &&
-             python django_app/user_service.py"
+      sh -c "python django_app/manage.py start_grpc_server"
+    environment:
+      - DB_HOST=mysql-django
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=testdb
+    depends_on:
+      - django-server
+      - mysql-django
+
+  mysql-django:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: testdb
+    volumes:
+      - mysql-data-django:/var/lib/mysql
 
   mysql:
     image: mysql:8.0
@@ -59,3 +90,4 @@ services:
 
 volumes:
   mysql-data:
+  mysql-data-django:

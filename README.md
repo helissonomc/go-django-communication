@@ -26,7 +26,7 @@ curl --location 'http://localhost:8080/users' \                                 
     "password": "test123"
 }'
 ```
-This will create the user in the golang service where you can check it by running:
+This will create the user in the golang service, you can check it by running:
 ```
 curl --location 'http://localhost:8080/users'
 ```

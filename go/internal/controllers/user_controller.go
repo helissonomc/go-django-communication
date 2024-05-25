@@ -105,10 +105,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		Password: user.Password,
 	}
 	log.Println(grpcUser)
-
 	_, err = grpc_client.CreateUser(context.Background(), grpcUser)
 	if err != nil {
-		log.Println(http.StatusInternalServerError)
+		log.Println(err.Error(), http.StatusInternalServerError)
 	}
 }
 

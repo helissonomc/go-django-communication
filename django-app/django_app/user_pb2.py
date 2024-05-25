@@ -14,27 +14,27 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x04user\"A\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x10\n\x08password\x18\x04 \x01(\t\"-\n\x11\x43reateUserRequest\x12\x18\n\x04user\x18\x01 \x01(\x0b\x32\n.user.User\".\n\x12\x43reateUserResponse\x12\x18\n\x04user\x18\x01 \x01(\x0b\x32\n.user.User\"-\n\x11UpdateUserRequest\x12\x18\n\x04user\x18\x01 \x01(\x0b\x32\n.user.User\".\n\x12UpdateUserResponse\x12\x18\n\x04user\x18\x01 \x01(\x0b\x32\n.user.User\"\x1f\n\x11\x44\x65leteUserRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"%\n\x12\x44\x65leteUserResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\xd0\x01\n\x0bUserService\x12?\n\nCreateUser\x12\x17.user.CreateUserRequest\x1a\x18.user.CreateUserResponse\x12?\n\nUpdateUser\x12\x17.user.UpdateUserRequest\x1a\x18.user.UpdateUserResponse\x12?\n\nDeleteUser\x12\x17.user.DeleteUserRequest\x1a\x18.user.DeleteUserResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x02pb\"A\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x10\n\x08password\x18\x04 \x01(\t\"+\n\x11\x43reateUserRequest\x12\x16\n\x04user\x18\x01 \x01(\x0b\x32\x08.pb.User\",\n\x12\x43reateUserResponse\x12\x16\n\x04user\x18\x01 \x01(\x0b\x32\x08.pb.User\"+\n\x11UpdateUserRequest\x12\x16\n\x04user\x18\x01 \x01(\x0b\x32\x08.pb.User\",\n\x12UpdateUserResponse\x12\x16\n\x04user\x18\x01 \x01(\x0b\x32\x08.pb.User\"\x1f\n\x11\x44\x65leteUserRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"%\n\x12\x44\x65leteUserResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\xc4\x01\n\x0bUserService\x12;\n\nCreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\x12;\n\nUpdateUser\x12\x15.pb.UpdateUserRequest\x1a\x16.pb.UpdateUserResponse\x12;\n\nDeleteUser\x12\x15.pb.DeleteUserRequest\x1a\x16.pb.DeleteUserResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'user_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_USER']._serialized_start=20
-  _globals['_USER']._serialized_end=85
-  _globals['_CREATEUSERREQUEST']._serialized_start=87
-  _globals['_CREATEUSERREQUEST']._serialized_end=132
-  _globals['_CREATEUSERRESPONSE']._serialized_start=134
-  _globals['_CREATEUSERRESPONSE']._serialized_end=180
-  _globals['_UPDATEUSERREQUEST']._serialized_start=182
-  _globals['_UPDATEUSERREQUEST']._serialized_end=227
-  _globals['_UPDATEUSERRESPONSE']._serialized_start=229
-  _globals['_UPDATEUSERRESPONSE']._serialized_end=275
-  _globals['_DELETEUSERREQUEST']._serialized_start=277
-  _globals['_DELETEUSERREQUEST']._serialized_end=308
-  _globals['_DELETEUSERRESPONSE']._serialized_start=310
-  _globals['_DELETEUSERRESPONSE']._serialized_end=347
-  _globals['_USERSERVICE']._serialized_start=350
-  _globals['_USERSERVICE']._serialized_end=558
+  _globals['_USER']._serialized_start=18
+  _globals['_USER']._serialized_end=83
+  _globals['_CREATEUSERREQUEST']._serialized_start=85
+  _globals['_CREATEUSERREQUEST']._serialized_end=128
+  _globals['_CREATEUSERRESPONSE']._serialized_start=130
+  _globals['_CREATEUSERRESPONSE']._serialized_end=174
+  _globals['_UPDATEUSERREQUEST']._serialized_start=176
+  _globals['_UPDATEUSERREQUEST']._serialized_end=219
+  _globals['_UPDATEUSERRESPONSE']._serialized_start=221
+  _globals['_UPDATEUSERRESPONSE']._serialized_end=265
+  _globals['_DELETEUSERREQUEST']._serialized_start=267
+  _globals['_DELETEUSERREQUEST']._serialized_end=298
+  _globals['_DELETEUSERRESPONSE']._serialized_start=300
+  _globals['_DELETEUSERRESPONSE']._serialized_end=337
+  _globals['_USERSERVICE']._serialized_start=340
+  _globals['_USERSERVICE']._serialized_end=536
 # @@protoc_insertion_point(module_scope)

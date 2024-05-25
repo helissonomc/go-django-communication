@@ -40,17 +40,17 @@ class UserServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateUser = channel.unary_unary(
-                '/user.UserService/CreateUser',
+                '/pb.UserService/CreateUser',
                 request_serializer=user__pb2.CreateUserRequest.SerializeToString,
                 response_deserializer=user__pb2.CreateUserResponse.FromString,
                 _registered_method=True)
         self.UpdateUser = channel.unary_unary(
-                '/user.UserService/UpdateUser',
+                '/pb.UserService/UpdateUser',
                 request_serializer=user__pb2.UpdateUserRequest.SerializeToString,
                 response_deserializer=user__pb2.UpdateUserResponse.FromString,
                 _registered_method=True)
         self.DeleteUser = channel.unary_unary(
-                '/user.UserService/DeleteUser',
+                '/pb.UserService/DeleteUser',
                 request_serializer=user__pb2.DeleteUserRequest.SerializeToString,
                 response_deserializer=user__pb2.DeleteUserResponse.FromString,
                 _registered_method=True)
@@ -97,9 +97,9 @@ def add_UserServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'user.UserService', rpc_method_handlers)
+            'pb.UserService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('user.UserService', rpc_method_handlers)
+    server.add_registered_method_handlers('pb.UserService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -120,7 +120,7 @@ class UserService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.UserService/CreateUser',
+            '/pb.UserService/CreateUser',
             user__pb2.CreateUserRequest.SerializeToString,
             user__pb2.CreateUserResponse.FromString,
             options,
@@ -147,7 +147,7 @@ class UserService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.UserService/UpdateUser',
+            '/pb.UserService/UpdateUser',
             user__pb2.UpdateUserRequest.SerializeToString,
             user__pb2.UpdateUserResponse.FromString,
             options,
@@ -174,7 +174,7 @@ class UserService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.UserService/DeleteUser',
+            '/pb.UserService/DeleteUser',
             user__pb2.DeleteUserRequest.SerializeToString,
             user__pb2.DeleteUserResponse.FromString,
             options,

@@ -1,4 +1,5 @@
 import grpc
+import logging
 from concurrent import futures
 import user_pb2
 import user_pb2_grpc
@@ -28,10 +29,11 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     user_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
     server.add_insecure_port('[::]:50052')
-    print("a"*20)
     server.start()
+    print("Server started, listening on 50052")
     server.wait_for_termination()
 
 
 if __name__ == '__main__':
     serve()
+    logging.basicConfig()

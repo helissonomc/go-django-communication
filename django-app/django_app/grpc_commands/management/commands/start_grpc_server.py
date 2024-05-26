@@ -1,6 +1,6 @@
 import logging
 from django.core.management.base import BaseCommand
-from user_service import server
+from grpc_commands.services.user_service import server
 
 
 class Command(BaseCommand):

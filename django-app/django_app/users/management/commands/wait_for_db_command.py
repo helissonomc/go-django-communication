@@ -19,4 +19,4 @@ class Command(BaseCommand):
                 time.sleep(1)
 
         self.stdout.write(self.style.SUCCESS('Database available!'))
-        time.sleep(10)
+        time.sleep(20)

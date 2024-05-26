@@ -1,8 +1,9 @@
 package main
 
 import (
+	"go-django/internal/controllers"
 	"go-django/internal/database"
-	"go-django/internal/grpc_client"
+	"go-django/internal/grpcclient"
 	"go-django/internal/routers"
 	"log"
 	"net/http"
@@ -13,8 +14,14 @@ import (
 func main() {
 	database.InitDB()
 	defer database.DB.Close()
-	router := routers.InitRouter()
-	grpc_client.InitGRPCClient()
+	grpcClient, err := grpcclient.NewClient("django-grpc-server:50052")
+	if err != nil {
+		log.Fatalf("Failed to create gRPC client: %v", err)
+	}
+	log.Println("gRPC client initialized", grpcClient)
+
+	userController := controllers.NewUserController(grpcClient)
+	router := routers.InitRouter(userController)
 
 	log.Printf("Listening to localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", router))

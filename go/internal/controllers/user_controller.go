@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"go-django/internal/database"
-	"go-django/internal/grpc_client"
+	"go-django/internal/grpcclient"
 	"go-django/internal/models"
 	"go-django/internal/pb"
 	"log"
@@ -16,7 +16,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+type UserController struct {
+	grpClient grpcclient.GrpClientInterface
+}
+
+func NewUserController(grpClient grpcclient.GrpClientInterface) *UserController {
+	return &UserController{grpClient: grpClient}
+}
+
+func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	rows, err := database.DB.Query("SELECT id, name, email FROM users")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -42,7 +50,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -65,7 +73,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -105,13 +113,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		Password: user.Password,
 	}
 	log.Println(grpcUser)
-	_, err = grpc_client.CreateUser(context.Background(), grpcUser)
+	_, err = uc.grpClient.CreateUser(context.Background(), grpcUser)
 	if err != nil {
 		log.Println(err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -154,7 +162,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {

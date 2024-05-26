@@ -107,10 +107,9 @@ func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Call gRPC to notify Django service
 	grpcUser := &pb.User{
-		Id:       int32(user.ID),
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
+		Id:    int32(user.ID),
+		Name:  user.Name,
+		Email: user.Email,
 	}
 	log.Println(grpcUser)
 	_, err = uc.grpClient.CreateUser(context.Background(), grpcUser)
@@ -160,6 +159,20 @@ func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+
+	// Call gRPC to notify Django service
+	grpcUser := &pb.User{
+		Id:       int32(id),
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+	}
+	log.Println(grpcUser)
+	_, err = uc.grpClient.UpdateUser(context.Background(), grpcUser)
+	if err != nil {
+		log.Println(err.Error(), http.StatusInternalServerError)
+	}
+
 }
 
 func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -177,4 +190,10 @@ func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+	// Call gRPC to notify Django service
+	_, err = uc.grpClient.DeleteUser(context.Background(), int32(id))
+	if err != nil {
+		log.Println(err.Error(), http.StatusInternalServerError)
+	}
+
 }

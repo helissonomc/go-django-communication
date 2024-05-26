@@ -23,11 +23,16 @@ class UserService(user_pb2_grpc.UserServiceServicer):
         # Return the updated user
         user = user_pb2.User(id=request.user.id, name=request.user.name, email=request.user.email)
         logging.info(user)
+        ExternalUser.objects.filter(external_id=user.id).update(
+            email=user.email,
+            name=user.name,
+        )
         return user_pb2.UpdateUserResponse(user=user)
 
     def DeleteUser(self, request, context):
         # Implement logic to delete user in Django
         # Return a response indicating success
+        ExternalUser.objects.filter(external_id=request.id).delete()
         return user_pb2.DeleteUserResponse(success=True)
 
 

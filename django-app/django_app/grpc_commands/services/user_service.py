@@ -4,6 +4,7 @@ from concurrent import futures
 from pb import user_pb2
 from pb import user_pb2_grpc
 
+from grpc_commands.services.auth_interceptor import AuthInterceptor
 from users.models import ExternalUser
 
 
@@ -11,8 +12,12 @@ class UserService(user_pb2_grpc.UserServiceServicer):
     def CreateUser(self, request, context):
         # Implement logic to create user in Django
         # Return the created user
-        user = user_pb2.User(id=request.user.id, name=request.user.name, email=request.user.email)
-        ExternalUser.objects.create(external_id=user.id, name=user.name, email=user.email)
+        user = user_pb2.User(
+            id=request.user.id, name=request.user.name, email=request.user.email
+        )
+        ExternalUser.objects.create(
+            external_id=user.id, name=user.name, email=user.email
+        )
 
         response = user_pb2.CreateUserResponse(user=user)
         logging.info(response)
@@ -21,7 +26,9 @@ class UserService(user_pb2_grpc.UserServiceServicer):
     def UpdateUser(self, request, context):
         # Implement logic to update user in Djangoxw
         # Return the updated user
-        user = user_pb2.User(id=request.user.id, name=request.user.name, email=request.user.email)
+        user = user_pb2.User(
+            id=request.user.id, name=request.user.name, email=request.user.email
+        )
         logging.info(user)
         ExternalUser.objects.filter(external_id=user.id).update(
             email=user.email,
@@ -37,9 +44,14 @@ class UserService(user_pb2_grpc.UserServiceServicer):
 
 
 def server():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    valid_tokens = ["token_test", "your-valid-token2"]
+    auth_interceptor = AuthInterceptor(valid_tokens)
+    server = grpc.server(
+        futures.ThreadPoolExecutor(max_workers=10), interceptors=(auth_interceptor,)
+    )
+
     user_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
-    server.add_insecure_port('[::]:50052')
+    server.add_insecure_port("[::]:50052")
     server.start()
     print("Server started, listening on 50052")
     server.wait_for_termination()

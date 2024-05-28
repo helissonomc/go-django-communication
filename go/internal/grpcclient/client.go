@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+    "google.golang.org/grpc/metadata"
 )
 
 type client struct {
@@ -38,11 +39,17 @@ func (client *client) Close() {
 	client.conn.Close()
 }
 
-func NewClient(address string) (GrpClientInterface, error) {
+func NewClient(address string, token string) (GrpClientInterface, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+    
+    // Add the auth interceptor
+	opts := []grpc.DialOption{
+		grpc.WithUnaryInterceptor(authInterceptor(token)),
+		grpc.WithInsecure(),
+	}
 
-	conn, err := grpc.DialContext(ctx, address, grpc.WithInsecure())
+	conn, err := grpc.DialContext(ctx, address, opts...) 
 	if err != nil {
 		return nil, err
 	}
@@ -54,4 +61,20 @@ func NewClient(address string) (GrpClientInterface, error) {
 		conn:          conn,
 		serviceClient: serviceClient,
 	}, nil
+}
+
+func authInterceptor(token string) grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		// Add token to metadata
+		md := metadata.Pairs("authorization", token)
+		ctx = metadata.NewOutgoingContext(ctx, md)
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
 }

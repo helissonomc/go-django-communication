@@ -8,9 +8,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DB *sql.DB
 
-func createUsersTable() {
+type DbClient struct {
+    DB *sql.DB
+}
+
+func NewDbClient(db *sql.DB) *DbClient{
+    return &DbClient{DB: db}        
+}
+
+func (db *DbClient) createUsersTable() {
 	query := `CREATE TABLE IF NOT EXISTS users (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		name VARCHAR(100) NOT NULL,
@@ -18,13 +25,13 @@ func createUsersTable() {
 		password VARCHAR(255) NOT NULL
 	);`
 
-	_, err := DB.Exec(query)
+	_, err := db.DB.Exec(query)
 	if err != nil {
 		log.Fatal("Failed to create users table:", err)
 	}
 }
 
-func InitDB() {
+func InitDB() *DbClient {
 	cfg := config.GetConfig()
 
 	db, err := sql.Open("mysql", cfg.GetDSN())
@@ -37,6 +44,7 @@ func InitDB() {
 		log.Fatal(err)
 	}
     log.Printf("Connected to the database successfully!")
-	DB = db
-    createUsersTable()
+    dbClient := NewDbClient(db)
+    dbClient.createUsersTable()
+    return dbClient
 }

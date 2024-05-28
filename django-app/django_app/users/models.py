@@ -7,4 +7,4 @@ class ExternalUser(models.Model):
     external_id = models.IntegerField(unique=True)
 
     class Meta:
-        app_label = 'users'
+        app_label = "users"

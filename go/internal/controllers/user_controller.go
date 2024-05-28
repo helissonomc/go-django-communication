@@ -18,14 +18,15 @@ import (
 
 type UserController struct {
 	grpClient grpcclient.GrpClientInterface
+    dbClient *database.DbClient
 }
 
-func NewUserController(grpClient grpcclient.GrpClientInterface) *UserController {
-	return &UserController{grpClient: grpClient}
+func NewUserController(grpClient grpcclient.GrpClientInterface, dbClient *database.DbClient) *UserController {
+	return &UserController{grpClient: grpClient, dbClient: dbClient}
 }
 
 func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
-	rows, err := database.DB.Query("SELECT id, name, email FROM users")
+	rows, err := uc.dbClient.DB.Query("SELECT id, name, email FROM users")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -59,7 +60,7 @@ func (uc *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	err = database.DB.QueryRow("SELECT id, name, email FROM users WHERE id = ?", id).Scan(&user.ID, &user.Name, &user.Email)
+	err = uc.dbClient.DB.QueryRow("SELECT id, name, email FROM users WHERE id = ?", id).Scan(&user.ID, &user.Name, &user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "User not found", http.StatusNotFound)
@@ -88,7 +89,7 @@ func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Password = string(hashedPassword)
-	result, err := database.DB.Exec("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", user.Name, user.Email, user.Password)
+	result, err := uc.dbClient.DB.Exec("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", user.Name, user.Email, user.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -140,7 +141,7 @@ func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user.Password = string(hashedPassword)
-		_, err = database.DB.Exec(
+		_, err = uc.dbClient.DB.Exec(
 			`UPDATE users
             SET name = ?, email = ?, password = ?
             WHERE id = ?`,
@@ -150,7 +151,7 @@ func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			id,
 		)
 	} else {
-		_, err = database.DB.Exec("UPDATE users SET name = ?, email = ? WHERE id = ?", user.Name, user.Email, id)
+		_, err = uc.dbClient.DB.Exec("UPDATE users SET name = ?, email = ? WHERE id = ?", user.Name, user.Email, id)
 	}
 
 	if err != nil {
@@ -183,7 +184,7 @@ func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = database.DB.Exec("DELETE FROM users WHERE id = ?", id)
+	_, err = uc.dbClient.DB.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

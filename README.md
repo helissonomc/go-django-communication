@@ -2,7 +2,9 @@
 
 This project is a showcase on how gRPC can be used for comunication between serverice. In this case a service built with golang and another built with Django.
 
-![django-go drawio](https://github.com/helissonomc/go-django-communication/assets/60279210/35e6139b-6515-45d0-ad05-4f92c8b8bd59)
+
+![Untitled Diagram drawio (1)](https://github.com/helissonomc/go-django-communication/assets/60279210/43eced62-111d-4aed-bdfe-ba007600121a)
+
 
 We have a Restful API on go server, where we can perform a CRUD of an User
 

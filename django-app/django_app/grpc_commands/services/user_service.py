@@ -15,7 +15,9 @@ class UserService(user_pb2_grpc.UserServiceServicer):
         user = user_pb2.User(
             id=request.user.id, name=request.user.name, email=request.user.email
         )
-        ExternalUser.objects.create(
+        external_user = ExternalUser
+        external_user.from_grpc = True
+        external_user.objects.create(
             external_id=user.id, name=user.name, email=user.email
         )
 

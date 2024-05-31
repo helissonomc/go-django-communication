@@ -13,20 +13,10 @@ type server struct {
 	pb.UnimplementedUserServiceServer
 }
 
-func (s *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	user := req.GetUser()
-	// Add logic to create user in database here
-	log.Println(user)
-	// For example, let's pretend we added the user and return it
-	return &pb.CreateUserResponse{
-		User: user,
-	}, nil
-}
-
 func (s *server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 	user := req.GetUser()
 	// Add logic to update user in database here
-	log.Println(user)
+	log.Println("update", user)
 	// For example, let's pretend we updated the user and return it
 	return &pb.UpdateUserResponse{
 		User: user,

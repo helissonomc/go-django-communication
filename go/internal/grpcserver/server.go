@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"go-django/internal/database"
 	"go-django/internal/pb"
 	"log"
 	"net"
@@ -11,13 +12,20 @@ import (
 
 type server struct {
 	pb.UnimplementedUserServiceServer
+	dbClient *database.DbClient
 }
 
 func (s *server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 	user := req.GetUser()
-	// Add logic to update user in database here
 	log.Println("update", user)
-	// For example, let's pretend we updated the user and return it
+	s.dbClient.DB.Exec(
+		`UPDATE users
+		SET name = ?, email = ?
+		WHERE id = ?`,
+		user.Name,
+		user.Email,
+		user.GetId(),
+	)
 	return &pb.UpdateUserResponse{
 		User: user,
 	}, nil
@@ -25,9 +33,10 @@ func (s *server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 
 func (s *server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
 	// Add logic to delete user from database here
-	log.Println(req)
+	log.Println("delete", req)
+	s.dbClient.DB.Exec("DELETE FROM users WHERE id = ?", req.Id)
 	// For example, let's pretend we deleted the user
-	return &pb.DeleteUserResponse{}, nil
+	return &pb.DeleteUserResponse{Success: true}, nil
 }
 
 func StartGRPCServer(address string) {
@@ -35,9 +44,11 @@ func StartGRPCServer(address string) {
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
+	dbClient := database.InitDB()
+	defer dbClient.DB.Close()
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserServiceServer(grpcServer, &server{})
+	pb.RegisterUserServiceServer(grpcServer, &server{dbClient: dbClient})
 
 	log.Printf("gRPC server listening on %s", address)
 	if err := grpcServer.Serve(listener); err != nil {

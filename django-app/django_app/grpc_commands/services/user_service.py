@@ -15,12 +15,11 @@ class UserService(user_pb2_grpc.UserServiceServicer):
         user = user_pb2.User(
             id=request.user.id, name=request.user.name, email=request.user.email
         )
-        external_user = ExternalUser
-        external_user.from_grpc = True
-        external_user.objects.create(
+        external_user = ExternalUser(
             external_id=user.id, name=user.name, email=user.email
         )
-
+        external_user.from_grpc = True
+        external_user.save()
         response = user_pb2.CreateUserResponse(user=user)
         logging.info(response)
         return response
@@ -32,16 +31,19 @@ class UserService(user_pb2_grpc.UserServiceServicer):
             id=request.user.id, name=request.user.name, email=request.user.email
         )
         logging.info(user)
-        ExternalUser.objects.filter(external_id=user.id).update(
-            email=user.email,
-            name=user.name,
-        )
+        external_user = ExternalUser.objects.get(external_id=user.id)
+        external_user.from_grpc = True
+        external_user.email = user.email
+        external_user.name = user.name
+        external_user.save()
         return user_pb2.UpdateUserResponse(user=user)
 
     def DeleteUser(self, request, context):
         # Implement logic to delete user in Django
         # Return a response indicating success
-        ExternalUser.objects.filter(external_id=request.id).delete()
+        external_user = ExternalUser.objects.get(external_id=request.id)
+        external_user.from_grpc = True
+        external_user.delete()
         return user_pb2.DeleteUserResponse(success=True)
 
 

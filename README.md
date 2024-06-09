@@ -36,5 +36,7 @@ and  also it will create a gRPC call to the Django gRPC server and it will also 
 You can check it in `http://localhost:8081/admin/users/externaluser/` user: `admin` password: `adminpassword`
 ![image](https://github.com/helissonomc/go-django-communication/assets/60279210/082f86e5-ec12-4b67-9999-dbc5d2de01d9)
 
+You can also use django admin to do update and delete and it will also reflect in the Go service. We have a gprc client in the django server and a grpc server in the Go service
+
 Check ou this postman collections for the create user, update and delete.
 [go-django.postman_collection.json](https://github.com/helissonomc/go-django-communication/files/15449411/go-django.postman_collection.json)
